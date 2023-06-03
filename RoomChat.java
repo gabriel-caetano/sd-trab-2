@@ -3,10 +3,14 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RoomChat extends UnicastRemoteObject implements IRoomChat {
+public class RoomChat extends UnicastRemoteObject implements IRoomChat, Runnable {
   private String roomName;
   private Map<String, IUserChat> userList;
   
+	public void run() {
+		System.out.println("running chat room " + this.roomName);
+	}
+
   public RoomChat(String roomName) throws RemoteException {
       this.roomName = roomName;
       userList = new HashMap<>();

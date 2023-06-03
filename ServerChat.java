@@ -5,17 +5,16 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.*;
-import java.util.HashMap;
 
 public class ServerChat extends UnicastRemoteObject implements IServerChat {
     private ArrayList<String> roomList;
     private Map<String, RoomChat> roomChats;
     private Registry registry;
-    private ExecutorService roomPool;
+    private ExecutorService pool;
     
     public ServerChat(Registry registry) throws RemoteException {
         roomList = new ArrayList<>();
-        roomPool = Executors.newCachedThreadPool();
+        pool = Executors.newCachedThreadPool();
         this.registry = registry;
     }
     
@@ -24,9 +23,16 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
     }
     
     public void createRoom(String roomName) throws RemoteException {
-        roomList.add(roomName);
-        RoomChat newRoom = new RoomChat(roomName);
-        roomChats.put(roomName, newRoom);
+        System.out.println("Creating room " + roomName);
+        try {
+            RoomChat room = new RoomChat(roomName);
+            registry.bind(roomName, room);
+            pool.execute(room);
+            roomList.add(roomName);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        System.out.println("Created room " + roomName);
     }
 
     public RoomChat geRoomChat(String chatName) throws RemoteException {
@@ -39,11 +45,13 @@ public class ServerChat extends UnicastRemoteObject implements IServerChat {
             Registry registry = LocateRegistry.createRegistry(port);
 
             System.out.println("RMI registry created on port: " + port);
-
+            
             ServerChat serverChat = new ServerChat(registry);
-            IServerChat stub = (IServerChat) UnicastRemoteObject.exportObject(serverChat, 0);
 
-            registry.bind("Servidor", stub);
+            registry.bind("Servidor", serverChat);
+
+            System.out.println("Server is ready!");
+
         } catch (Exception e) {
             System.err.println("Erro: " + e.getMessage());
         }
