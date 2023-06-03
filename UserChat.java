@@ -16,9 +16,12 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
 	public UserChat(String userName) throws RemoteException {
 		this.userName = userName;
 	}
+	
+	public String getUserName() { return this.userName; }
 
 	public void deliverMsg(String senderName, String msg) throws RemoteException {
 		System.out.println("Mensagem recebida de " + senderName + ": " + msg);
+		// adicionar na interface msg recebida 
 	}
 
 	public static void main(String[] args) {
@@ -31,20 +34,25 @@ public class UserChat extends UnicastRemoteObject implements IUserChat {
 		frame.getContentPane().add(new JScrollPane(messageArea), BorderLayout.CENTER);
 		frame.pack();
 		try {
+			// Criação do usuário com nome definido pela interface
+			// IUserChat user = new UserChat("Nome do Usuário");
+			
+			// conecta com servidor
 			Registry registry = LocateRegistry.getRegistry("localhost", 2020);
 			IServerChat server = (IServerChat) registry.lookup("Servidor");
 
+			// mostra lista de salas existentes ou opção para criar nova sala
 			List<String> roomList = server.getRooms();
 			System.out.println("Lista de salas disponíveis:");
 			for (String room : roomList) {
 				System.out.println(room);
 			}
-
-			// Escolha da sala pelo usuário
-			// String selectedRoom = ""; // Supondo que o usuário tenha selecionado uma sala
-
-			// IUserChat user = new UserChat("Nome do Usuário");
-			// room.joinRoom("Nome do Usuário", user);
+			// se for criada sala deve ser atualizada lista de salas existentes
+			
+			// usuário se conecta a sala escolhida
+			IRoomChat room = (IRoomChat) registry.lookup("roomName"); // roomName escolhido na interface
+			// room.joinRoom(user.getUserName(), user);
+			
 
 			// // Enviar mensagens para a sala
 			// room.sendMsg("Nome do Usuário", "Olá, pessoal!");
