@@ -125,7 +125,7 @@ public class UserChatGUI extends JFrame implements ActionListener {
             Registry registry = LocateRegistry.getRegistry("localhost", 2020);
             currentRoom = (IRoomChat) registry.lookup(roomName);
 
-            user = new UserChat(userName);
+            user = new UserChat(userName, this);
             currentRoom.joinRoom(userName, user);
 
             joinButton.setEnabled(false);
@@ -166,7 +166,7 @@ public class UserChatGUI extends JFrame implements ActionListener {
         }
     }
 
-    private void updateMessageArea(String senderName, String message) {
+    public void updateMessageArea(String senderName, String message) {
         String currentText = messageArea.getText();
         messageArea.setText(currentText + senderName + ": " + message + "\n");
         messageArea.setCaretPosition(messageArea.getDocument().getLength());
@@ -178,7 +178,6 @@ public class UserChatGUI extends JFrame implements ActionListener {
             String message = inputField.getText();
     
             currentRoom.sendMsg(userName, message);
-            updateMessageArea(userName, message);
     
             inputField.setText("");
         } catch (RemoteException e) {

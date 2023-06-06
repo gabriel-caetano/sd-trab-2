@@ -11,15 +11,18 @@ import javax.swing.JTextField;
 
 public class UserChat extends UnicastRemoteObject implements IUserChat {
 	private String userName;
+	private UserChatGUI userChatGUI;
 	
-	public UserChat(String userName) throws RemoteException {
+	public UserChat(String userName, UserChatGUI userChatGUI) throws RemoteException {
 		this.userName = userName;
+		this.userChatGUI = userChatGUI;
 	}
 	
 	public String getUserName() { return this.userName; }
 
 	public void deliverMsg(String senderName, String msg) throws RemoteException {
 		System.out.println("Mensagem recebida de " + senderName + ": " + msg);
+		userChatGUI.updateMessageArea(senderName, msg);
 	}
 
 	// public static void main(String[] args) {
